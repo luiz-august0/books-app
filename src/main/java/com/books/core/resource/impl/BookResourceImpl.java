@@ -42,6 +42,23 @@ public class BookResourceImpl implements BookResource {
     }
 
     @Override
+    public void saveBookFromImport(BookDTO book) {
+        if (book.getIsbn() != null) {
+            Book bookByISBN = bookRepository.findByISBN(book.getIsbn());
+
+            if (bookByISBN != null) {
+                book.setId(bookByISBN.getId());
+            }
+        }
+
+        if (book.getId() != null) {
+            updateBook(book.getId(), book);
+        } else {
+            createBook(book);
+        }
+    }
+
+    @Override
     public void deleteBook(Integer id) {
         bookRepository.remove(id);
     }

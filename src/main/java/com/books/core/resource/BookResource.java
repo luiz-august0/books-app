@@ -10,6 +10,8 @@ public interface BookResource {
 	void createBook(BookDTO book);
 	
 	void updateBook(Integer id, BookDTO book);
+
+	void saveBookFromImport(BookDTO book);
 	
 	void deleteBook(Integer id);
 	

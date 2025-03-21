@@ -44,6 +44,21 @@ public class BookRepositoryImpl implements BookRepository {
 
     @Override
     @SuppressWarnings("unchecked")
+    public Book findByISBN(Long isbn) {
+        Query query = entityManager.createQuery("" +
+                " select b from Book b " +
+                "  where b.isbn = :isbn "
+        );
+
+        query.setParameter("isbn", isbn);
+
+        List<Book> books = query.getResultList();
+
+        return !books.isEmpty() ? books.get(0) : null;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<Book> findAll(Book book) {
         StringBuilder sql = new StringBuilder("" +
                 " select b from Book b where 1 > 0"

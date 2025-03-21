@@ -11,23 +11,27 @@ import java.util.Objects;
 @Getter
 public enum EnumBookColumn {
 
-    ID(0, "Cód.", BookDTO::getId),
-    TITLE(1, "Título", BookDTO::getTitle),
-    PUBLISHER(2, "Editora", BookDTO::getPublisher),
-    AUTHORS(3, "Autores", BookDTO::getAuthors),
-    ISBN(4, "ISBN", BookDTO::getIsbn),
-    PUBLISH_DATE(5, "Data de publicação", (book -> DateUtil.formatDDMMYYYY(book.getPublishDate()))),
-    SIMILAR_BOOKS(6, "Livros semelhantes", BookDTO::getSimilarBooks);
+    ID(0, "Cód.", "id", BookDTO::getId),
+    TITLE(1, "Título", "title", BookDTO::getTitle),
+    AUTHORS(2, "Autores", "authors", BookDTO::getAuthors),
+    PUBLISH_DATE(3, "Data de publicação", "publishDate", (book ->
+            book.getPublishDate() != null ? DateUtil.formatDDMMYYYY(book.getPublishDate()) : null)),
+    ISBN(4, "ISBN", "isbn", BookDTO::getIsbn),
+    PUBLISHER(5, "Editora", "publisher", BookDTO::getPublisher),
+    SIMILAR_BOOKS(6, "Livros semelhantes", "similarBooks", BookDTO::getSimilarBooks);
 
     private final Integer column;
 
     private final String headerName;
 
+    private final String fieldName;
+
     private final BookColumnValueGetter valueGetter;
 
-    EnumBookColumn(Integer column, String headerName, BookColumnValueGetter valueGetter) {
+    EnumBookColumn(Integer column, String headerName, String fieldName, BookColumnValueGetter valueGetter) {
         this.column = column;
         this.headerName = headerName;
+        this.fieldName = fieldName;
         this.valueGetter = valueGetter;
     }
 

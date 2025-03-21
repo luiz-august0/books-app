@@ -1,62 +1,25 @@
 package com.books.app.controller;
 
+import com.books.app.controller.abstracts.BookAdvisorController;
 import com.books.app.controller.validation.ValidationError;
-import com.books.app.controller.validation.interfaces.IFieldValidation;
+import com.books.app.model.enums.EnumBookColumn;
 import com.books.app.view.BookView;
 import com.books.core.dto.BookDTO;
 import com.books.core.factory.FactoryResource;
 import com.books.core.resource.BookResource;
 import com.books.utils.DateUtil;
 import com.books.utils.NumericUtil;
-import com.books.utils.enums.EnumDateFormat;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class BookController {
+public class BookController extends BookAdvisorController {
 
-    private static final Map<String, IFieldValidation> validationsMap = new HashMap<>();
     private final BookView bookView;
     private final BookResource bookResource;
     private BookDTO editBook = null;
-
-    static {
-        validationsMap.put("title", (value) -> {
-            if (value.toString().isEmpty()) {
-                return new ValidationError("Título é obrigatório", 0);
-            }
-
-            return null;
-        });
-
-        validationsMap.put("authors", (value) -> {
-            if (value.toString().isEmpty()) {
-                return new ValidationError("Autores é obrigatório", 1);
-            }
-
-            return null;
-        });
-
-        validationsMap.put("publishDate", (value) -> {
-            if (value.toString().replaceAll("/", "").trim().isEmpty()) {
-                return new ValidationError("Data de publicação é obrigatório", 2);
-            }
-
-            if (!DateUtil.isValidDate(value.toString(), EnumDateFormat.DDMMYYYY)) {
-                return new ValidationError("Data de publicação é invalida", 2);
-            }
-
-            return null;
-        });
-
-        validationsMap.put("publisher", (value) -> {
-            if (value.toString().isEmpty()) {
-                return new ValidationError("Editora é obrigatório", 3);
-            }
-
-            return null;
-        });
-    }
 
     public BookController(BookView bookView) {
         this.bookView = bookView;
@@ -66,12 +29,12 @@ public class BookController {
     public void onSave() {
         Map<String, Object> values = new HashMap<>();
 
-        values.put("title", bookView.getJTitleField().getText());
-        values.put("authors", bookView.getJAuthorsField().getText());
-        values.put("publishDate", bookView.getJPublishDateField().getText());
-        values.put("isbn", bookView.getJISBNField().getText());
-        values.put("publisher", bookView.getJPublisherField().getText());
-        values.put("similarBooks", bookView.getJSimilarBooksField().getText());
+        values.put(EnumBookColumn.TITLE.getFieldName(), bookView.getJTitleField().getText());
+        values.put(EnumBookColumn.AUTHORS.getFieldName(), bookView.getJAuthorsField().getText());
+        values.put(EnumBookColumn.PUBLISH_DATE.getFieldName(), bookView.getJPublishDateField().getText());
+        values.put(EnumBookColumn.ISBN.getFieldName(), bookView.getJISBNField().getText());
+        values.put(EnumBookColumn.PUBLISHER.getFieldName(), bookView.getJPublisherField().getText());
+        values.put(EnumBookColumn.SIMILAR_BOOKS.getFieldName(), bookView.getJSimilarBooksField().getText());
 
         save(values);
     }
@@ -105,14 +68,7 @@ public class BookController {
     private void save(Map<String, Object> values) {
         if (validate(values)) {
             try {
-                BookDTO book = BookDTO.builder()
-                        .title(values.get("title").toString())
-                        .authors(values.get("authors").toString())
-                        .publishDate(DateUtil.formatStringToDate(values.get("publishDate").toString(), EnumDateFormat.DDMMYYYY))
-                        .isbn(NumericUtil.parseLong(values.get("isbn").toString().replaceAll("-", "").trim()))
-                        .publisher(values.get("publisher").toString())
-                        .similarBooks(values.get("similarBooks").toString())
-                        .build();
+                BookDTO book = getBookFromValues(values);
 
                 if (editBook != null) {
                     bookResource.updateBook(editBook.getId(), book);
@@ -129,20 +85,7 @@ public class BookController {
     }
 
     private boolean validate(Map<String, Object> values) {
-        List<ValidationError> errors = new ArrayList<>();
-
-        values.forEach((field, value) -> {
-            IFieldValidation fieldValidation = validationsMap.get(field);
-
-            if (fieldValidation != null) {
-                ValidationError validationError = fieldValidation.validate(value);
-
-                if (validationError != null)
-                    errors.add(validationError);
-            }
-        });
-
-        errors.sort(Comparator.comparing(ValidationError::getOrder));
+        List<ValidationError> errors = getValidationErrors(values);
 
         if (!errors.isEmpty()) {
             JOptionPane.showMessageDialog(bookView, String.join("\n", errors.stream().map(ValidationError::getError).toList()));

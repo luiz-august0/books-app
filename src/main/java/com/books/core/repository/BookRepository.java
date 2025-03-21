@@ -10,6 +10,8 @@ public interface BookRepository {
 
     Book findById(Integer id);
 
+    Book findByISBN(Long isbn);
+
     List<Book> findAll(Book book);
 
     void remove(Integer id);

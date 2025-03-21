@@ -14,6 +14,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JMenu jMenuBooks;
     private javax.swing.JMenuItem jMenuItemCreateBooks;
     private JMenuItem jMenuItemListBooks;
+    private JMenuItem jMenuImportCSV;
 
     public MainView() {
         initComponents();
@@ -51,6 +52,15 @@ public class MainView extends javax.swing.JFrame {
         jMenuItemListBooks.setText("Visualizar Livros");
         jMenuBooks.add(jMenuItemListBooks);
 
+        jMenuImportCSV = new JMenuItem();
+        jMenuImportCSV.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jMenuImportCSVActionPerformed(e);
+            }
+        });
+        jMenuImportCSV.setText("Importar CSV");
+        jMenuBooks.add(jMenuImportCSV);
+
         jMenuBar.add(jMenuBooks);
 
         setJMenuBar(jMenuBar);
@@ -75,6 +85,10 @@ public class MainView extends javax.swing.JFrame {
 
     private void jMenuItemListBooksActionPerformed(java.awt.event.ActionEvent evt) {
         mainController.openListView();
+    }
+
+    private void jMenuImportCSVActionPerformed(java.awt.event.ActionEvent evt) {
+        mainController.openImportCSVView();
     }
 
 }
