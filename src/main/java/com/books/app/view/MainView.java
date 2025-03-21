@@ -4,6 +4,10 @@ import com.books.app.constants.FormTitleConstants;
 import com.books.app.controller.MainController;
 
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.Dimension;
 
 public class MainView extends javax.swing.JFrame {
 	
@@ -11,6 +15,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar;
     private javax.swing.JMenu jMenuBooks;
     private javax.swing.JMenuItem jMenuItemCreateBooks;
+    private JMenuItem jMenuItemListBooks;
 	
     public MainView() {
         initComponents();
@@ -22,22 +27,31 @@ public class MainView extends javax.swing.JFrame {
 
         jMenuBar = new javax.swing.JMenuBar();
         jMenuBooks = new javax.swing.JMenu();
-        jMenuItemCreateBooks = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Books");
-        setMinimumSize(new java.awt.Dimension(800, 600));
-        setPreferredSize(new java.awt.Dimension(800, 600));
+        setTitle("Livros App");
+        setMinimumSize(new Dimension(1280, 720));
+        setPreferredSize(new Dimension(1280, 720));
 
         jMenuBooks.setText("Livros");
-
-        jMenuItemCreateBooks.setText("Criar um novo");
-        jMenuItemCreateBooks.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemCreateBooksActionPerformed(evt);
-            }
+        jMenuItemCreateBooks = new javax.swing.JMenuItem();
+        
+                jMenuItemCreateBooks.setText("Criar um novo");
+                jMenuItemCreateBooks.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        jMenuItemCreateBooksActionPerformed(evt);
+                    }
+                });
+                jMenuBooks.add(jMenuItemCreateBooks);
+        
+        jMenuItemListBooks = new JMenuItem();
+        jMenuItemListBooks.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		jMenuItemListBooksActionPerformed(e);
+        	}
         });
-        jMenuBooks.add(jMenuItemCreateBooks);
+        jMenuItemListBooks.setText("Visualizar Livros");
+        jMenuBooks.add(jMenuItemListBooks);
 
         jMenuBar.add(jMenuBooks);
 
@@ -59,6 +73,10 @@ public class MainView extends javax.swing.JFrame {
 
     private void jMenuItemCreateBooksActionPerformed(java.awt.event.ActionEvent evt) {
     	mainController.openBookView();
+    }
+    
+    private void jMenuItemListBooksActionPerformed(java.awt.event.ActionEvent evt) {
+    	mainController.openListView();
     }
     
 }

@@ -1,16 +1,28 @@
 package com.books.core.factory;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.books.core.repository.impl.BookRepositoryImpl;
 import com.books.core.resource.BookResource;
 import com.books.core.resource.impl.BookResourceImpl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class FactoryResource extends Factory {
-	
-	static {
-		implementations.put(BookResource.class, new BookResourceImpl());
-	}
-	
+
+    private static FactoryResource instance;
+
+    @Override
+    public Map<Class<?>, Object> getImplementations() {
+        Map<Class<?>, Object> implementations = new HashMap<>();
+        implementations.put(BookResource.class, new BookResourceImpl());
+
+        return implementations;
+    }
+
+    public static synchronized FactoryResource getInstance() {
+        if (instance == null)
+            instance = new FactoryResource();
+
+        return instance;
+    }
+
 }

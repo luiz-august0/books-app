@@ -1,55 +1,106 @@
 package com.books.core.resource.impl;
 
-import java.util.Collection;
+import com.books.core.domain.Book;
+import com.books.core.dto.BookAuthorSearchDTO;
+import com.books.core.dto.BookDTO;
+import com.books.core.dto.BookISBNSearchDTO;
+import com.books.core.factory.FactoryRepository;
+import com.books.core.infrastructure.HttpTemplate;
+import com.books.core.repository.BookRepository;
+import com.books.core.resource.BookResource;
+import com.books.utils.DateUtil;
+import com.books.utils.enums.EnumDateFormat;
+import org.modelmapper.ModelMapper;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
-
-import com.books.core.domain.Book;
-import com.books.core.dto.BookDTO;
-import com.books.core.factory.FactoryRepository;
-import com.books.core.repository.BookRepository;
-import com.books.core.resource.BookResource;
-
 public class BookResourceImpl implements BookResource {
-	
-	private final BookRepository bookRepository;
-	
-	public BookResourceImpl() {
-		this.bookRepository = (BookRepository) FactoryRepository.getInstance(BookRepository.class);
-	}
 
-	@Override
-	public BookDTO createBook(BookDTO book) {
-		return mapToDTO(bookRepository.save(mapToDomain(book))); 
-	}
+    private final BookRepository bookRepository;
+    private static final String OPEN_LIBRARY_URL = "https://openlibrary.org";
+    private static final String ISBN_PATH = "/isbn";
 
-	@Override
-	public BookDTO updateBook(Integer id, BookDTO book) {
-		book.setId(id);
-		
-		return mapToDTO(bookRepository.save(mapToDomain(book))); 
-	}
+    public BookResourceImpl() {
+        this.bookRepository = (BookRepository) FactoryRepository.getInstance().get(BookRepository.class);
+    }
 
-	@Override
-	public void deleteBook(Integer id) {
-		bookRepository.remove(id);		
-	}
+    @Override
+    public void createBook(BookDTO book) {
+        validateISBN(book);
 
-	@Override
-	public List<BookDTO> list() {
-		return bookRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
-	}
-	
-	private BookDTO mapToDTO(Book book) {
-		ModelMapper mapper = new ModelMapper();
-		return mapper.map(book, BookDTO.class);
-	}
-	
-	private Book mapToDomain(BookDTO book) {
-		ModelMapper mapper = new ModelMapper();
-		return mapper.map(book, Book.class);
-	}
+        bookRepository.save(mapToDomain(book));
+    }
+
+    @Override
+    public void updateBook(Integer id, BookDTO book) {
+        book.setId(id);
+        validateISBN(book);
+
+        bookRepository.save(mapToDomain(book));
+    }
+
+    @Override
+    public void deleteBook(Integer id) {
+        bookRepository.remove(id);
+    }
+
+    @Override
+    public List<BookDTO> list(BookDTO book) {
+        return bookRepository.findAll(mapToDomain(book))
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public BookDTO searchByISBN(Long isbn) {
+        List<String> authors = new ArrayList<>();
+
+        BookISBNSearchDTO isbnSearchDTO = new HttpTemplate<>(BookISBNSearchDTO.class).get(
+                OPEN_LIBRARY_URL + ISBN_PATH + "/" + isbn + ".json"
+        );
+
+        isbnSearchDTO.getAuthors().forEach(authorsMap -> {
+            authors.addAll(authorsMap.values().stream()
+                    .map(authorUrl -> {
+                        return new HttpTemplate<>(BookAuthorSearchDTO.class)
+                                .get(OPEN_LIBRARY_URL + "/" + authorUrl + ".json")
+                                .getName();
+                    })
+                    .toList());
+        });
+
+        return BookDTO.builder()
+                .title(isbnSearchDTO.getTitle())
+                .isbn(isbn)
+                .authors(String.join(",", authors))
+                .publishDate(DateUtil.formatStringToDate(isbnSearchDTO.getPublishDate(), EnumDateFormat.EXTENSIVE))
+                .publisher(String.join(",", isbnSearchDTO.getPublishers()))
+                .build();
+    }
+
+    private BookDTO mapToDTO(Book book) {
+        ModelMapper mapper = new ModelMapper();
+        return mapper.map(book, BookDTO.class);
+    }
+
+    private Book mapToDomain(BookDTO book) {
+        ModelMapper mapper = new ModelMapper();
+        return mapper.map(book, Book.class);
+    }
+
+    private void validateISBN(BookDTO book) {
+        if (book.getIsbn() != null) {
+            int countByISBN = bookRepository.countByISBNAndIdIsNot(
+                    book.getIsbn(), book.getId() != null ? book.getId() : -1
+            );
+
+            if (countByISBN > 0) {
+                throw new RuntimeException("Já existe um livro com este código ISBN cadastrado");
+            }
+        }
+    }
 
 }

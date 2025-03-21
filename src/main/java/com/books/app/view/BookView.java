@@ -1,19 +1,20 @@
 package com.books.app.view;
 
 import com.books.app.controller.BookController;
-
 import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 @Getter
 public class BookView extends javax.swing.JInternalFrame {
-    
+
     private final BookController bookController;
     private javax.swing.JTextField jAuthorsField;
     private javax.swing.JLabel jAuthorsLabel;
-    private javax.swing.JTextField jISBNField;
     private javax.swing.JLabel jISBNLabel;
     private javax.swing.JFormattedTextField jPublishDateField;
     private javax.swing.JLabel jPublishDateLabel;
@@ -25,22 +26,29 @@ public class BookView extends javax.swing.JInternalFrame {
     private javax.swing.JButton jSubmitButton;
     private javax.swing.JTextField jTitleField;
     private javax.swing.JLabel jTitleLabel;
+    private JLabel jISBNSearchLabel;
+    private JFormattedTextField jISBNSearchField;
+    private JFormattedTextField jISBNField;
 
     public BookView() {
         initComponents();
         this.bookController = new BookController(this);
     }
 
+    public BookView(Integer bookId) {
+        initComponents();
+        this.bookController = new BookController(this);
+        this.bookController.setBookId(bookId);
+    }
+
     @SuppressWarnings("unchecked")
     private void initComponents() {
-
         jTitleField = new javax.swing.JTextField();
         jTitleLabel = new javax.swing.JLabel();
         jAuthorsField = new javax.swing.JTextField();
         jAuthorsLabel = new javax.swing.JLabel();
         jPublishDateLabel = new javax.swing.JLabel();
         jPublishDateField = new javax.swing.JFormattedTextField();
-        jISBNField = new javax.swing.JTextField();
         jISBNLabel = new javax.swing.JLabel();
         jPublisherLabel = new javax.swing.JLabel();
         jPublisherField = new javax.swing.JTextField();
@@ -68,8 +76,6 @@ public class BookView extends javax.swing.JInternalFrame {
             ex.printStackTrace();
         }
 
-        jISBNField.setName(""); // NOI18N
-
         jISBNLabel.setText("ISBN");
 
         jPublisherLabel.setText("Editora *");
@@ -85,77 +91,116 @@ public class BookView extends javax.swing.JInternalFrame {
         jSubmitButton.setText("Salvar");
         jSubmitButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jSubmitButtonActionPerformed(evt);
+                jSubmitButtonActionPerformed();
             }
         });
 
+        jISBNSearchLabel = new JLabel();
+        jISBNSearchLabel.setText("Pesquisa por ISBN");
+
+        jISBNSearchField = new JFormattedTextField();
+
+        try {
+            jISBNSearchField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###-##-#####-##-#")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+
+        jISBNField = new JFormattedTextField();
+
+        try {
+            jISBNField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###-##-#####-##-#")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+
+        JButton jSearchISBNButton = new JButton();
+        jSearchISBNButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jSearchISBNButtonActionPerformed();
+            }
+        });
+        jSearchISBNButton.setText("Pesquisar");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(22, 22, 22)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jSimilarBooksLabel, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTitleLabel)
-                            .addComponent(jTitleField))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jAuthorsLabel)
-                            .addComponent(jAuthorsField)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jPublishDateLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPublishDateField))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jISBNLabel)
-                            .addComponent(jISBNField, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPublisherField)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jPublisherLabel)
-                                .addGap(0, 0, Short.MAX_VALUE))))
-                    .addComponent(jSubmitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSimilarBooksScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE))
-                .addGap(22, 22, 22))
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(32)
+                                .addGroup(layout.createParallelGroup(Alignment.TRAILING)
+                                        .addGroup(layout.createParallelGroup(Alignment.LEADING, false)
+                                                .addComponent(jSimilarBooksLabel)
+                                                .addGroup(layout.createSequentialGroup()
+                                                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                                                .addComponent(jTitleLabel)
+                                                                .addComponent(jTitleField)
+                                                                .addGroup(layout.createSequentialGroup()
+                                                                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                                                                .addComponent(jISBNSearchLabel)
+                                                                                .addComponent(jISBNSearchField, GroupLayout.PREFERRED_SIZE, 146, GroupLayout.PREFERRED_SIZE))
+                                                                        .addGap(18)
+                                                                        .addComponent(jSearchISBNButton, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)))
+                                                        .addGap(18)
+                                                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                                                .addComponent(jAuthorsLabel)
+                                                                .addComponent(jAuthorsField)))
+                                                .addGroup(layout.createSequentialGroup()
+                                                        .addGroup(layout.createParallelGroup(Alignment.LEADING, false)
+                                                                .addComponent(jPublishDateField)
+                                                                .addComponent(jPublishDateLabel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                        .addGap(18)
+                                                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                                                .addComponent(jISBNLabel)
+                                                                .addComponent(jISBNField, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE))
+                                                        .addPreferredGap(ComponentPlacement.UNRELATED)
+                                                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                                                .addComponent(jPublisherLabel)
+                                                                .addComponent(jPublisherField)))
+                                                .addComponent(jSimilarBooksScrollPane, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(jSubmitButton, GroupLayout.PREFERRED_SIZE, 102, GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(28, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jAuthorsLabel)
-                    .addComponent(jTitleLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jAuthorsField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTitleField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.TRAILING)
                         .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jPublishDateLabel)
-                                .addComponent(jISBNLabel))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jPublishDateField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jISBNField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPublisherLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPublisherField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(20, 20, 20)
-                .addComponent(jSimilarBooksLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSimilarBooksScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(44, 44, 44)
-                .addComponent(jSubmitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(25, Short.MAX_VALUE))
+                                .addGap(23)
+                                .addGroup(layout.createParallelGroup(Alignment.TRAILING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jISBNSearchLabel)
+                                                .addPreferredGap(ComponentPlacement.RELATED)
+                                                .addComponent(jISBNSearchField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(jSearchISBNButton, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                        .addComponent(jAuthorsLabel)
+                                        .addComponent(jTitleLabel))
+                                .addPreferredGap(ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                        .addComponent(jAuthorsField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jTitleField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addGap(20)
+                                .addGroup(layout.createParallelGroup(Alignment.TRAILING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                        .addComponent(jPublishDateLabel)
+                                                        .addComponent(jISBNLabel))
+                                                .addPreferredGap(ComponentPlacement.RELATED)
+                                                .addComponent(jPublishDateField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jPublisherLabel)
+                                                .addPreferredGap(ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                        .addComponent(jPublisherField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jISBNField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+                                .addGap(20)
+                                .addComponent(jSimilarBooksLabel)
+                                .addPreferredGap(ComponentPlacement.RELATED)
+                                .addComponent(jSimilarBooksScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addGap(55)
+                                .addComponent(jSubmitButton, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
+        getContentPane().setLayout(layout);
 
         jTitleField.getAccessibleContext().setAccessibleName("");
 
@@ -164,8 +209,13 @@ public class BookView extends javax.swing.JInternalFrame {
         pack();
     }
 
-    private void jSubmitButtonActionPerformed(java.awt.event.ActionEvent evt) {
-    	bookController.onSave();
+    private void jSubmitButtonActionPerformed() {
+        bookController.onSave();
     }
-    
+
+    private void jSearchISBNButtonActionPerformed() {
+        bookController.onSearchISBN();
+    }
+
+
 }

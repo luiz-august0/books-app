@@ -2,16 +2,19 @@ package com.books.core.resource;
 
 import java.util.List;
 
+import com.books.core.domain.Book;
 import com.books.core.dto.BookDTO;
 
 public interface BookResource {
 	
-	BookDTO createBook(BookDTO book);
+	void createBook(BookDTO book);
 	
-	BookDTO updateBook(Integer id, BookDTO book);
+	void updateBook(Integer id, BookDTO book);
 	
 	void deleteBook(Integer id);
 	
-	List<BookDTO> list();
+	List<BookDTO> list(BookDTO book);
+
+	BookDTO searchByISBN(Long isbn);
 	
 }
