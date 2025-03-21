@@ -54,7 +54,7 @@ public class BookRepositoryImpl implements BookRepository {
         }
 
         if (book.getIsbn() != null) {
-            sql.append(" and b.isbn = :isbn ");
+            sql.append(" and b.isbn = ").append(book.getIsbn());
         }
 
         if (book.getAuthors() != null) {

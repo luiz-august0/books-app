@@ -9,7 +9,6 @@ import com.books.core.resource.BookResource;
 import com.books.utils.DateUtil;
 import com.books.utils.NumericUtil;
 import com.books.utils.enums.EnumDateFormat;
-import lombok.Setter;
 
 import javax.swing.*;
 import java.util.*;
@@ -19,9 +18,7 @@ public class BookController {
     private static final Map<String, IFieldValidation> validationsMap = new HashMap<>();
     private final BookView bookView;
     private final BookResource bookResource;
-
-    @Setter
-    private Integer bookId = null;
+    private BookDTO editBook = null;
 
     static {
         validationsMap.put("title", (value) -> {
@@ -91,11 +88,16 @@ public class BookController {
         }
     }
 
+    public void onEditBook(BookDTO book) {
+        this.editBook = book;
+        setFieldsByBook(book);
+    }
+
     private void setFieldsByBook(BookDTO bookDTO) {
         bookView.getJTitleField().setText(bookDTO.getTitle());
         bookView.getJAuthorsField().setText(bookDTO.getAuthors());
         bookView.getJPublishDateField().setText(DateUtil.formatDDMMYYYY(bookDTO.getPublishDate()));
-        bookView.getJISBNField().setText(bookDTO.getIsbn().toString());
+        bookView.getJISBNField().setText(bookDTO.getIsbn() != null ? bookDTO.getIsbn().toString() : null);
         bookView.getJPublisherField().setText(bookDTO.getPublisher());
         bookView.getJSimilarBooksField().setText(bookDTO.getSimilarBooks());
     }
@@ -112,8 +114,8 @@ public class BookController {
                         .similarBooks(values.get("similarBooks").toString())
                         .build();
 
-                if (bookId != null) {
-                    bookResource.updateBook(bookId, book);
+                if (editBook != null) {
+                    bookResource.updateBook(editBook.getId(), book);
                 } else {
                     bookResource.createBook(book);
                 }

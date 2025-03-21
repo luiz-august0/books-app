@@ -1,6 +1,7 @@
 package com.books.app.view;
 
 import com.books.app.controller.BookController;
+import com.books.core.dto.BookDTO;
 import lombok.Getter;
 
 import javax.swing.*;
@@ -35,10 +36,10 @@ public class BookView extends javax.swing.JInternalFrame {
         this.bookController = new BookController(this);
     }
 
-    public BookView(Integer bookId) {
+    public BookView(BookDTO book) {
         initComponents();
         this.bookController = new BookController(this);
-        this.bookController.setBookId(bookId);
+        this.bookController.onEditBook(book);
     }
 
     @SuppressWarnings("unchecked")
@@ -216,6 +217,5 @@ public class BookView extends javax.swing.JInternalFrame {
     private void jSearchISBNButtonActionPerformed() {
         bookController.onSearchISBN();
     }
-
 
 }
