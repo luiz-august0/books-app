@@ -230,7 +230,7 @@ public class DateUtil {
 
             return format.parse(date);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 

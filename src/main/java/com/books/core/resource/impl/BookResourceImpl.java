@@ -79,15 +79,17 @@ public class BookResourceImpl implements BookResource {
                 OPEN_LIBRARY_URL + ISBN_PATH + "/" + isbn + ".json"
         );
 
-        isbnSearchDTO.getAuthors().forEach(authorsMap -> {
-            authors.addAll(authorsMap.values().stream()
-                    .map(authorUrl -> {
-                        return new HttpTemplate<>(BookAuthorSearchDTO.class)
-                                .get(OPEN_LIBRARY_URL + "/" + authorUrl + ".json")
-                                .getName();
-                    })
-                    .toList());
-        });
+        if (isbnSearchDTO.getAuthors() != null) {
+            isbnSearchDTO.getAuthors().forEach(authorsMap -> {
+                authors.addAll(authorsMap.values().stream()
+                        .map(authorUrl -> {
+                            return new HttpTemplate<>(BookAuthorSearchDTO.class)
+                                    .get(OPEN_LIBRARY_URL + "/" + authorUrl + ".json")
+                                    .getName();
+                        })
+                        .toList());
+            });
+        }
 
         return BookDTO.builder()
                 .title(isbnSearchDTO.getTitle())
